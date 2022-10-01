@@ -1,37 +1,45 @@
-const ethers = require('ethers') //yarn add ethers
-const fs = require('fs-extra')
-require('dotenv').config() //yarn add dotenv
+// TS import
+import {ethers} from "ethers"
+import * as fs from "fs-extra" // yarn add @types/fs-extra
+import "dotenv/config"
+
+// JS Import
+//const ethers = require("ethers") //yarn add ethers
+//const fs = require("fs-extra")
+//require("dotenv").config() //yarn add dotenv
 
 async function main() {
     // Compile them in our code
     // HTTP://127.0.0.1:8545
-    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL)
+    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL!)
+    /*
     const encryptedJson = fs.readFileSync('./.encryptedKey.json', 'utf8')
     let wallet = new ethers.Wallet.fromEncryptedJsonSync(
         encryptedJson,
         process.env.PRIVATE_KEY_PWD
     )
     wallet = await wallet.connect(provider)
-    /*
+    */
     const wallet = new ethers.Wallet(
-        process.env.PRIVATE_KEY, // Private key
+        process.env.PRIVATE_KEY!, // Private key
         provider
     )
-    */
+
     const abi = fs.readFileSync(
-        './_SimpleStorage_sol_SimpleStorage.abi', // Abi
-        'utf8'
+        "./_SimpleStorage_sol_SimpleStorage.abi", // Abi
+        "utf8"
     )
     const binary = fs.readFileSync(
-        './_SimpleStorage_sol_SimpleStorage.bin', // Binary
-        'utf8'
+        "./_SimpleStorage_sol_SimpleStorage.bin", // Binary
+        "utf8"
     )
     const contractFactory = new ethers.ContractFactory(abi, binary, wallet) // Create contract
 
     // Easy way to do
-    console.log('Deploying...')
+    console.log("Deploying...")
     const contract = await contractFactory.deploy() // Deploy contract Wait to finish the transaction
     await contract.deployTransaction.wait(1) // Needed to wait
+    console.log(`Contract address : ${contract.address}`)
     //console.log('Here is the deployment transaction (responce):')
     //console.log(contract.deployTransaction)
     //console.log('Here is the transaction recipt:')
@@ -62,7 +70,7 @@ async function main() {
 
     const currentFavNumber = await contract.retrieve()
     console.log(`Current favorite numbre: ${currentFavNumber.toString()}`) // Return big numner in hexadecimal ==> add to string to get the number
-    const transactionResponse = await contract.store('10')
+    const transactionResponse = await contract.store("10")
     const transactionReceipt = await transactionResponse.wait(1)
     const favNumberUpdated = await contract.retrieve()
     console.log(`Current favorite number: ${favNumberUpdated}`)
